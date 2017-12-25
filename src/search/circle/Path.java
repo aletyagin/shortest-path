@@ -5,9 +5,11 @@ import javax.json.JsonArrayBuilder;
 import java.util.LinkedList;
 
 public class Path implements Cloneable {
-    private LinkedList<Route> paths = new LinkedList<>();
+    final private LinkedList<IRoute> paths = new LinkedList<>();
 
-    public void addRoute(Route path) {
+    private IRoute fullRoute = new NullRoute();
+
+    public void addRoute(IRoute path) {
         paths.addLast(path);
     }
 
@@ -19,19 +21,30 @@ public class Path implements Cloneable {
         return clone;
     }
 
-    public Integer length() {
-        return
-            paths.stream()
-                .mapToInt(Route::getDistance)
-                    .sum()
-        ;
+    public Boolean isLonger(Path path) {
+        return this.fullRoute().weight() > path.fullRoute().weight();
     }
 
-    public JsonArrayBuilder toJson(JsonArrayBuilder builder) {
-        for (Route route: paths) {
-            builder.add(route.toJson(Json.createArrayBuilder()));
+    public JsonArrayBuilder asJson() {
+        JsonArrayBuilder builder = Json.createArrayBuilder();
+
+        for (IRoute route: paths) {
+            builder.add(route.asJson());
         }
 
         return builder;
+    }
+
+    private IRoute fullRoute() {
+        if (this.fullRoute.weight() == 0) {
+            this.fullRoute =
+                paths.stream().reduce(
+                    this.fullRoute,
+                    (current, path) -> path.addRoute(current)
+                )
+            ;
+        }
+
+        return this.fullRoute;
     }
 }

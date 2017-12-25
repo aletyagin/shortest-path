@@ -1,13 +1,17 @@
 package search.circle.algorithm;
 
-import search.circle.Route;
-import search.circle.Paths;
-import search.circle.Path;
+import org.cactoos.collection.Limited;
+import org.cactoos.collection.Sorted;
+import org.cactoos.list.ListOf;
+import search.circle.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HamiltonianPath {
     final private Integer INFINITY = 999999999;
 
-    public Paths find(int[][] weightMatrix) {
+    public IPaths find(int[][] weightMatrix, Integer shortestPathsCount) {
 
         Integer n = weightMatrix.length;
         int m = 1<<n;
@@ -51,18 +55,31 @@ public class HamiltonianPath {
             }
         }
 
-        Paths paths = new Paths(INFINITY);
-
+        List<Path> paths = new ArrayList<>();
         for (int j=1; j<n; ++j) {
             if (weightMatrix[j][0] > 0) {
                 Path path = pathArray[m - 1][j];
                 path.addRoute(new Route(j, 0, t[j][0]));
-
-                paths.addPath(path);
+                paths.add(path);
             }
         }
 
-        return paths;
+        return
+            new Paths(
+                new Limited<>(
+                    shortestPathsCount,
+                    new Sorted<>(
+                        (Path a, Path b) -> {
+                            if (a.isLonger(b)) {
+                                return 1;
+                            }
+
+                            return -1;
+                        },
+                        new ListOf<>(paths)
+                    )
+                )
+            );
     }
 
     private Boolean get(Integer nmb, Integer x)

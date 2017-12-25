@@ -2,39 +2,21 @@ package search.circle;
 
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
-import java.util.ArrayList;
-import java.util.OptionalInt;
 
-public class Paths {
-    private ArrayList<Path> paths = new ArrayList<>();
-    final private Integer maxWeight;
+public class Paths implements IPaths {
+    private Iterable<Path> list;
 
-    public Paths(Integer maxWeight) {
-        this.maxWeight = maxWeight;
+    public Paths(Iterable<Path> src) {
+        this.list = src;
     }
 
-    public void addPath(Path path) {
-        this.paths.add(path);
-    }
+    public JsonArrayBuilder asJson() {
+        JsonArrayBuilder builder = Json.createArrayBuilder();
 
-    public Boolean notExists() {
-        return this.minLength().equals(maxWeight);
-    }
-
-    public JsonArrayBuilder toJson(JsonArrayBuilder builder) {
-        for (Path path: paths) {
-            builder.add(path.toJson(Json.createArrayBuilder()));
-        }
+        this.list.forEach(
+            path -> builder.add(path.asJson())
+        );
 
         return builder;
-    }
-
-    private Integer minLength() {
-        OptionalInt minLength = paths.stream().mapToInt(Path::length).min();
-        if (minLength.isPresent()) {
-            return minLength.getAsInt();
-        }
-
-        return this.maxWeight;
     }
 }

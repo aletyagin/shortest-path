@@ -4,8 +4,8 @@ import org.takes.Request;
 import org.takes.Response;
 import org.takes.Take;
 import org.takes.rs.RsJson;
+import search.circle.IPaths;
 import search.circle.algorithm.HamiltonianPath;
-import search.circle.Paths;
 
 import javax.json.*;
 import java.io.IOException;
@@ -31,13 +31,7 @@ public class Circle implements Take {
         for (int i=0; i<rowCount; i++) {
             JsonArray row = data.getJsonArray(i);
             if (colCount != row.size()) {
-                return
-                    new RsJson(
-                        Json.createObjectBuilder()
-                            .add("code", "1")
-                            .add("message", "invalid request parameter")
-                            .build()
-                    );
+                return new RsJson(this.errorJsonResponse("invalid request parameter"));
             }
 
             for (int j=0; j<colCount; j++) {
@@ -48,34 +42,33 @@ public class Circle implements Take {
         final int NMAX = 16;
 
         if (weightMatrix.length > NMAX) {
+            return new RsJson(this.errorJsonResponse("too many elements"));
+        }
+
+        IPaths paths = this.hamiltonianPath.find(weightMatrix, 3);
+
+        try {
             return
                 new RsJson(
                     Json.createObjectBuilder()
-                        .add("code", "1")
-                        .add("message", "too many elements")
+                        .add("code", "0")
+                        .add("message", "Some routes was found")
+                        .add("routes", paths.asJson())
                         .build()
                 );
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
 
-        Paths path = this.hamiltonianPath.find(weightMatrix);
+        return new RsJson(this.errorJsonResponse("Some errors occurred"));
+    }
 
-        if (path.notExists()) {
-            return
-                new RsJson(
-                    Json.createObjectBuilder()
-                        .add("code", "1")
-                        .add("message", "no route found")
-                        .build()
-                );
-        }
-
+    private JsonObject errorJsonResponse(String message) {
         return
-            new RsJson(
-                Json.createObjectBuilder()
-                    .add("code", "0")
-                    .add("message", "Some routes was found")
-                    .add("routes", path.toJson(Json.createArrayBuilder()))
-                    .build()
-            );
+            Json.createObjectBuilder()
+                .add("code", "1")
+                .add("message", message)
+                .build()
+        ;
     }
 }
