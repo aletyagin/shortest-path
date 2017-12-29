@@ -15,6 +15,7 @@ import org.takes.http.FtBasic;
 import org.takes.misc.Opt;
 import org.takes.rs.RsText;
 import search.Circle;
+import search.TkLogged;
 import search.circle.algorithm.HamiltonianPath;
 
 public final class App {
@@ -27,14 +28,15 @@ public final class App {
                             new TkFork(
                                 new FkMethods(
                                     "POST",
-                                    new TkFork(
-                                        new FkRegex("/circle", new Circle(new HamiltonianPath()))
+                                    new TkLogged(
+                                        new TkFork(
+                                            new FkRegex("/circle", new Circle(new HamiltonianPath()))
+                                        )
                                     )
                                 )
                             ),
                             new FbChain(
                                 new FbStatus(404, new RsText("sorry, page is absent")),
-                                new FbStatus(405, new RsText("this method is not allowed here")),
                                 new Fallback() {
                                     @Override
                                     public Opt<Response> route(final RqFallback req) {

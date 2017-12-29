@@ -23,6 +23,7 @@ public class Circle implements Take {
     @Override
     public Response act(Request request) throws IOException {
         JsonArray data = Json.createReader(request.body()).readArray();
+
         int rowCount = data.size();
         int colCount = data.getJsonArray(0).size();
 
@@ -47,20 +48,14 @@ public class Circle implements Take {
 
         IPaths paths = this.hamiltonianPath.find(weightMatrix, 3);
 
-        try {
-            return
-                new RsJson(
-                    Json.createObjectBuilder()
-                        .add("code", "0")
-                        .add("message", "Some routes was found")
-                        .add("routes", paths.asJson())
-                        .build()
-                );
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-
-        return new RsJson(this.errorJsonResponse("Some errors occurred"));
+        return
+            new RsJson(
+                Json.createObjectBuilder()
+                    .add("code", "0")
+                    .add("message", "Some routes was found")
+                    .add("routes", paths.asJson())
+                    .build()
+            );
     }
 
     private JsonObject errorJsonResponse(String message) {

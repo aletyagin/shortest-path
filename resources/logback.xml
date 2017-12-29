@@ -1,0 +1,68 @@
+<configuration scan="true" scanPeriod="5 seconds">
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type
+             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ELASTIC" class="com.internetitem.logback.elasticsearch.ElasticsearchAppender">
+        <url>http://elk:9200/_bulk</url>
+        <index>logs-%date{yyyy-MM-dd}</index>
+        <type>search</type>
+        <loggerName>es-logger</loggerName> <!-- optional. If set, raw ES-formatted log data will be sent to this logger -->
+        <errorLoggerName>es-error-logger</errorLoggerName> <!-- optional. If set, any internal errors or problems will be logged to this logger -->
+        <connectTimeout>30000</connectTimeout> <!-- optional (in ms, default 30000). Elasticsearch connect timeout (in ms) -->
+        <errorsToStderr>false</errorsToStderr> <!-- optional (default false).  If set to true, any errors in communicating with Elasticsearch will also be dumped to stderr  -->
+        <includeCallerData>false</includeCallerData> <!-- optional (default false).  If set to true, save the caller data (identical to the AsyncAppender's includeCallerData) -->
+        <logsToStderr>false</logsToStderr> <!-- optional (default false) -->
+        <maxQueueSize>104857600</maxQueueSize> <!-- optional (default 104857600). Maximum size (in characters) of the send buffer. After this point, logs will be dropped. This should only happen if Elasticsearch is down. -->
+        <maxRetries>3</maxRetries> <!-- optional (default 3).  Number of times to attempt retrying a message on failure. -->
+        <readTimeout>30000</readTimeout> <!-- optional (in ms, default 30000) -->
+        <sleepTime>250</sleepTime> <!-- optional (in ms, default 250). Time (in ms) to sleep between attempts at delivering a message -->
+        <rawJsonMessage>false</rawJsonMessage> <!-- optional (default false). If set to true, the log message is interpreted as pre-formatted raw JSON message. -->
+        <includeMdc>true</includeMdc> <!-- optional (default false) -->
+        <maxMessageSize>1000</maxMessageSize> <!-- optional (default -1).  If set to a number greater than 0, truncate messages larger than this length, then append ".." to denote that the message was truncated -->
+        <authentication class="com.internetitem.logback.elasticsearch.config.BasicAuthentication" /> <!-- optional -->
+        <properties>
+            <property>
+                <name>host</name>
+                <value>${HOSTNAME}</value>
+                <allowEmpty>false</allowEmpty>
+            </property>
+            <property>
+                <name>severity</name>
+                <value>%level</value>
+            </property>
+            <property>
+                <name>thread</name>
+                <value>%thread</value>
+            </property>
+            <property>
+                <name>stacktrace</name>
+                <value>%ex</value>
+            </property>
+            <property>
+                <name>logger</name>
+                <value>%logger</value>
+            </property>
+        </properties>
+        <headers>
+            <header>
+                <name>Content-Type</name>
+                <value>application/json</value>
+            </header>
+        </headers>
+    </appender>
+
+    <root level="debug">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="ELASTIC" />
+    </root>
+</configuration>
