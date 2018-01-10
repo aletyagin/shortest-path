@@ -1,4 +1,4 @@
-package search;
+package ru.itchyfeet.takes;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -33,7 +33,6 @@ public class TkLogged implements Take {
         this.origin = take;
     }
 
-    @Override
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public Response act(final Request req) throws IOException {
         final long start = System.currentTimeMillis();
@@ -42,12 +41,10 @@ public class TkLogged implements Take {
             new Request() {
                 private InputStream body = null;
 
-                @Override
                 public Iterable<String> head() throws IOException {
                     return req.head();
                 }
 
-                @Override
                 public InputStream body() throws IOException {
                     if (this.body == null) {
                         this.body = new BufferedInputStream(req.body());

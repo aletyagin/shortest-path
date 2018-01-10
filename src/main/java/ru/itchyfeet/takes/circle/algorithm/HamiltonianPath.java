@@ -1,14 +1,17 @@
-package search.circle.algorithm;
+package ru.itchyfeet.takes.circle.algorithm;
 
 import org.cactoos.collection.Limited;
 import org.cactoos.collection.Sorted;
 import org.cactoos.list.ListOf;
-import search.circle.*;
+import ru.itchyfeet.takes.circle.IPaths;
+import ru.itchyfeet.takes.circle.Path;
+import ru.itchyfeet.takes.circle.Paths;
+import ru.itchyfeet.takes.circle.Route;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HamiltonianPath {
+public class HamiltonianPath implements IHamiltonianPath {
     final private Integer INFINITY = 999999999;
 
     public IPaths find(int[][] weightMatrix, Integer shortestPathsCount) {

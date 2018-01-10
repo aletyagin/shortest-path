@@ -1,4 +1,4 @@
-package search.circle;
+package ru.itchyfeet.takes.circle;
 
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;

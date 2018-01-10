@@ -1,11 +1,11 @@
-package search;
+package ru.itchyfeet.takes;
 
 import org.takes.Request;
 import org.takes.Response;
 import org.takes.Take;
 import org.takes.rs.RsJson;
-import search.circle.IPaths;
-import search.circle.algorithm.HamiltonianPath;
+import ru.itchyfeet.takes.circle.IPaths;
+import ru.itchyfeet.takes.circle.algorithm.IHamiltonianPath;
 
 import javax.json.*;
 import java.io.IOException;
@@ -14,18 +14,27 @@ import java.io.IOException;
  * @link http://kursy-programmirovaniya.ru/zadacha-kommivoyazhyora-realizaciya-na-c.html
  */
 public class Circle implements Take {
-    private HamiltonianPath hamiltonianPath;
+    private IHamiltonianPath hamiltonianPath;
 
-    public Circle (HamiltonianPath hamiltonianPath) {
+    public Circle (IHamiltonianPath hamiltonianPath) {
         this.hamiltonianPath = hamiltonianPath;
     }
 
-    @Override
     public Response act(Request request) throws IOException {
         JsonArray data = Json.createReader(request.body()).readArray();
 
         int rowCount = data.size();
+
+        if (rowCount == 0) {
+            return new RsJson(this.errorJsonResponse("no suitable data"));
+        }
+
         int colCount = data.getJsonArray(0).size();
+
+        final int NMAX = 16;
+        if (rowCount > NMAX) {
+            return new RsJson(this.errorJsonResponse("too many elements"));
+        }
 
         int[][] weightMatrix = new int[rowCount][colCount];
 
@@ -38,12 +47,6 @@ public class Circle implements Take {
             for (int j=0; j<colCount; j++) {
                 weightMatrix[i][j] = row.getInt(j);
             }
-        }
-
-        final int NMAX = 16;
-
-        if (weightMatrix.length > NMAX) {
-            return new RsJson(this.errorJsonResponse("too many elements"));
         }
 
         IPaths paths = this.hamiltonianPath.find(weightMatrix, 3);
