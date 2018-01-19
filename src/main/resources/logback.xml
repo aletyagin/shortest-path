@@ -10,9 +10,9 @@
 
     <appender name="ELASTIC" class="com.internetitem.logback.elasticsearch.ElasticsearchAppender">
         <url>http://elk:9200/_bulk</url>
-        <index>logs-%date{yyyy-MM-dd}</index>
+        <index>search-logs-%date{yyyy-MM-dd}</index>
         <type>search</type>
-        <loggerName>es-logger</loggerName> <!-- optional. If set, raw ES-formatted log data will be sent to this logger -->
+        <!-- <loggerName>es-logger</loggerName> optional. If set, raw ES-formatted log data will be sent to this logger -->
         <errorLoggerName>es-error-logger</errorLoggerName> <!-- optional. If set, any internal errors or problems will be logged to this logger -->
         <connectTimeout>30000</connectTimeout> <!-- optional (in ms, default 30000). Elasticsearch connect timeout (in ms) -->
         <errorsToStderr>false</errorsToStderr> <!-- optional (default false).  If set to true, any errors in communicating with Elasticsearch will also be dumped to stderr  -->
@@ -62,7 +62,6 @@
     </root>
 
     <root level="info">
-        <appender-ref ref="STDOUT" />
         <appender-ref ref="ELASTIC" />
     </root>
 </configuration>
